@@ -14,15 +14,15 @@ public class CartController {
         List<Map<String, Object>> cartItems = new ArrayList<>();
 
         Map<String, Object> item1 = new HashMap<>();
-        item1.put("title", "The Lord of the Rings");
-        item1.put("price", 29.99);
+        item1.put("title", "Little Prince");
+        item1.put("price", 15.99);
         item1.put("quantity", 1);
         cartItems.add(item1);
 
         Map<String, Object> item2 = new HashMap<>();
-        item2.put("title", "Harry Potter");
-        item2.put("price", 19.99);
-        item2.put("quantity", 2);
+        item2.put("title", "Introduction to Algorithms");
+        item2.put("price", 90.99);
+        item2.put("quantity", 1);
         cartItems.add(item2);
 
         double total = cartItems.stream()
