@@ -12,11 +12,11 @@ public class DataLoader {
     @Bean
     public CommandLineRunner loadData(BookRepository bookRepository) {
         return (args) -> {
-            bookRepository.save(new Book(null, "Book Name", "Writer Name",
-                    "Fantasy", "/images/book.jpg", 10.99, false));
+            bookRepository.save(new Book(null, "Little Prince", "Antoine",
+                    "Classic", "/images/littleprince.jpg", 15.99, false));
 
-            bookRepository.save(new Book(null, "Book Name", "Writer Name",
-                    "Fantasy", "/images/book.jpg", 11.99, true));
+            bookRepository.save(new Book(null, "Introduction to Algorithms", "Thomas",
+                    "Programming", "/images/algorithms.jpg", 99.99, true));
         };
     }
 }
