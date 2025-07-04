@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Online Bookstore</title>
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .navbar {
+            background-color: #333;
+            padding: 10px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .navbar-left, .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .navbar a, .navbar button {
+            color: white;
+            text-decoration: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .search-bar input {
+            padding: 5px;
+            font-size: 16px;
+        }
+        .book-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px;
+            width: 200px;
+            float: left;
+            text-align: center;
+        }
+        img {
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="navbar">
+        <div class="navbar-left">
+            <a href="/">Online Bookstore</a>
+        </div>
+
+        <div class="navbar-right">
+            <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a href="/profile"><i class="fas fa-user-circle"></i> Profile</a>
+            <a href="/cart"><i class="fas fa-shopping-cart"></i> Cart</a>
+            <div class="search-bar">
+                <form th:action="@{/search}" method="get">
+                    <input type="text" name="keyword" placeholder="Search books..." />
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <h1>Featured Books</h1>
+
+    <div th:each="book : ${books}" class="book-card">
+        <img th:src="${book.imageUrl}" alt="Book Cover"/>
+        <h3 th:text="${book.title}"></h3>
+        <p th:text="${book.author}"></p>
+        <p th:text="'$' + ${book.price}"></p>
+        <a th:href="@{'/book/' + ${book.id}}">Details</a>
+        <button>Add to Cart</button>
+    </div>
+
+</body>
+</html>

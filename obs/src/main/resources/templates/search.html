@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Search Results - Online Bookstore</title>
+    <style>
+        .book-card {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin: 10px;
+            width: 200px;
+            float: left;
+            text-align: center;
+        }
+        img {
+            width: 100px;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Search Results for "<span th:text="${keyword}"></span>"</h2>
+
+    <div th:if="${#lists.isEmpty(books)}">
+        <p>No books found.</p>
+    </div>
+
+    <div th:each="book : ${books}" class="book-card">
+        <img th:src="${book.imageUrl}" alt="Book Cover"/>
+        <h3 th:text="${book.title}"></h3>
+        <p th:text="${book.author}"></p>
+        <p th:text="'$' + ${book.price}"></p>
+        <a th:href="@{'/book/' + ${book.id}}">Details</a>
+    </div>
+
+</body>
+</html>
