@@ -2,12 +2,14 @@ package com.example.obs.service;
 
 import com.example.obs.model.Book;
 import com.example.obs.model.CartItem;
+import com.example.obs.model.User;
 import com.example.obs.repository.BookRepository;
 import com.example.obs.repository.CartItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 
 @Service
@@ -19,7 +21,7 @@ public class CartService {
     @Autowired
     private BookRepository bookRepository;
 
-    public void addToCart(Long userId, Long bookId, int quantity) {
+    public void addToCart(User userId, Book bookId, int quantity) {
         Optional<CartItem> existing = cartItemRepository.findByUserId(userId).stream()
                 .filter(item -> item.getBookId().equals(bookId))
                 .findFirst();
@@ -33,18 +35,18 @@ public class CartService {
         }
     }
 
-    public List<Map<String, Object>> getCartItems(Long userId) {
+    public List<Map<String, Object>> getCartItems(User userId) {
         List<CartItem> cartItems = cartItemRepository.findByUserId(userId);
         List<Map<String, Object>> result = new ArrayList<>();
 
         for (CartItem item : cartItems) {
-            Optional<Book> book = bookRepository.findById(item.getBookId());
-            if (book.isPresent()) {
+            Book book = item.getBookId();
+            if (book != null) {
                 Map<String, Object> map = new HashMap<>();
-                map.put("title", book.get().getTitle());
-                map.put("price", book.get().getPrice());
+                map.put("title", book.getTitle());
+                map.put("price", book.getPrice());
                 map.put("quantity", item.getQuantity());
-                map.put("subtotal", book.get().getPrice() * item.getQuantity());
+                map.put("subtotal", book.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())));
                 result.add(map);
             }
         }
@@ -53,11 +55,11 @@ public class CartService {
     }
     
     @Transactional
-    public void clearCart(Long userId) {
+    public void clearCart(User userId) {
         cartItemRepository.deleteByUserId(userId);
     }
     
-    public int getCartItemCount(Long userId) {
+    public int getCartItemCount(User userId) {
         List<CartItem> items = cartItemRepository.findByUserId(userId);
         return items.stream().mapToInt(CartItem::getQuantity).sum();
     }

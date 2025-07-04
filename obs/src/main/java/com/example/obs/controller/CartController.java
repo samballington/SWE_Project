@@ -1,6 +1,8 @@
 package com.example.obs.controller;
 
 import com.example.obs.service.CartService;
+import com.example.obs.model.User;
+import com.example.obs.model.Book;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,7 +14,7 @@ public class CartController {
     @Autowired
     private CartService cartService;
 
-    private Long dummyUserId = 1L;
+    private final User dummyUserId = new User();
 
     @GetMapping("/cart")
     public String cartPage(Model model) {
@@ -27,7 +29,7 @@ public class CartController {
     }
 
     @PostMapping("/cart/add")
-    public String addToCart(@RequestParam Long bookId,
+    public String addToCart(@RequestParam Book bookId,
                             @RequestParam(defaultValue = "1") int quantity) {
         cartService.addToCart(dummyUserId, bookId, quantity);
         return "redirect:/";
@@ -35,7 +37,7 @@ public class CartController {
 
     @PostMapping("/cart/clear")
     public String clearCart() {
-        Long userId = dummyUserId;
+        User userId = dummyUserId;
         cartService.clearCart(userId);
         return "redirect:/cart";
     }
@@ -43,7 +45,7 @@ public class CartController {
     @GetMapping("/cart/count")
     @ResponseBody
     public int getCartCount() {
-        Long userId = dummyUserId;
+        User userId = dummyUserId;
         return cartService.getCartItemCount(userId);
     }
 

@@ -16,6 +16,7 @@ public class SearchController {
     @Autowired
     private BookService bookService;
 
+    // search function should also include search by author or/and genre
     @GetMapping("/search")
     public String search(@RequestParam String keyword, Model model) {
         List<Book> result = bookService.searchBooksByTitle(keyword);
