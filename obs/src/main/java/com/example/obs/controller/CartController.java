@@ -1,37 +1,50 @@
 package com.example.obs.controller;
 
+import com.example.obs.service.CartService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-
-import java.util.*;
+import org.springframework.web.bind.annotation.*;
 
 @Controller
 public class CartController {
 
+    @Autowired
+    private CartService cartService;
+
+    private Long dummyUserId = 1L;
+
     @GetMapping("/cart")
     public String cartPage(Model model) {
-        List<Map<String, Object>> cartItems = new ArrayList<>();
-
-        Map<String, Object> item1 = new HashMap<>();
-        item1.put("title", "Little Prince");
-        item1.put("price", 15.99);
-        item1.put("quantity", 1);
-        cartItems.add(item1);
-
-        Map<String, Object> item2 = new HashMap<>();
-        item2.put("title", "Introduction to Algorithms");
-        item2.put("price", 90.99);
-        item2.put("quantity", 1);
-        cartItems.add(item2);
-
+        var cartItems = cartService.getCartItems(dummyUserId);
         double total = cartItems.stream()
-                .mapToDouble(i -> (Double) i.get("price") * (Integer) i.get("quantity"))
+                .mapToDouble(item -> (double) item.get("subtotal"))
                 .sum();
 
         model.addAttribute("cartItems", cartItems);
         model.addAttribute("total", total);
-
         return "cart";
     }
+
+    @PostMapping("/cart/add")
+    public String addToCart(@RequestParam Long bookId,
+                            @RequestParam(defaultValue = "1") int quantity) {
+        cartService.addToCart(dummyUserId, bookId, quantity);
+        return "redirect:/";
+    }
+
+    @PostMapping("/cart/clear")
+    public String clearCart() {
+        Long userId = dummyUserId;
+        cartService.clearCart(userId);
+        return "redirect:/cart";
+    }
+    
+    @GetMapping("/cart/count")
+    @ResponseBody
+    public int getCartCount() {
+        Long userId = dummyUserId;
+        return cartService.getCartItemCount(userId);
+    }
+
 }

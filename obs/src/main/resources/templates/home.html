@@ -58,8 +58,11 @@
 			<a href="/register">Register</a>
             <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
             <a href="/profile"><i class="fas fa-user-circle"></i> Profile</a>
-            <a href="/cart"><i class="fas fa-shopping-cart"></i> Cart</a>
-            <div class="search-bar">
+			<a href="/cart">
+			    <i class="fas fa-shopping-cart"></i>
+			    Cart (<span id="cart-count">0</span>)
+			</a>
+			<div class="search-bar">
                 <form th:action="@{/search}" method="get">
                     <input type="text" name="keyword" placeholder="Search books..." />
                 </form>
@@ -74,9 +77,55 @@
         <h3 th:text="${book.title}"></h3>
         <p th:text="${book.author}"></p>
         <p th:text="'$' + ${book.price}"></p>
-        <a th:href="@{'/book/' + ${book.id}}">Details</a>
-        <button>Add to Cart</button>
+		<a th:href="@{'/book/' + ${book.id}}">Details</a>
+
+		<form th:action="@{/cart/add}" method="post">
+		    <input type="hidden" name="bookId" th:value="${book.id}" />
+		    <input type="hidden" name="quantity" value="1" />
+		    <button type="submit">Add to Cart</button>
+		</form>
     </div>
 
 </body>
 </html>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script>
+    function addToCart(bookId) {
+        axios.post('/cart/add', new URLSearchParams({
+            bookId: bookId,
+            quantity: 1
+        }))
+        .then(response => {
+            loadCartCount();
+            alert("Added to cart!");
+        })
+        .catch(error => {
+            alert("Failed to add to cart!");
+        });
+    }
+
+    function clearCart() {
+        axios.post('/cart/clear')
+            .then(response => {
+				document.getElementById("cart-count").textContent = "0";
+				window.location.href = "/cart";
+            })
+            .catch(error => {
+                alert("Failed to clear cart!");
+            });
+    }
+
+    function loadCartCount() {
+        axios.get('/cart/count')
+            .then(response => {
+                document.getElementById("cart-count").textContent = response.data;
+            })
+            .catch(error => {
+                console.error("Failed to load cart count", error);
+            });
+    }
+
+    window.onload = loadCartCount;
+</script>
+
