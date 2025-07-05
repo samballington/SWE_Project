@@ -55,6 +55,7 @@ public class AdminBookController {
             @RequestParam String author,
             @RequestParam String genre,
             @RequestParam BigDecimal price,
+            @RequestParam(required = false) String description,
             @RequestParam(required = false) boolean comingSoon,
             @RequestParam(required = false) MultipartFile imageFile) {
         
@@ -73,6 +74,7 @@ public class AdminBookController {
         book.setAuthor(author);
         book.setGenre(genre);
         book.setPrice(price);
+        book.setDescription(description);
         book.setComingSoon(comingSoon);
         
         // Save the book first to get an ID if it's new

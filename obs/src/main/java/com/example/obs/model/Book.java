@@ -17,6 +17,9 @@ public class Book {
     private String imageUrl;
     private BigDecimal price;
     private boolean comingSoon; // recommend to use enum for adding more categories in the future
+    
+    @Column(length = 2000)
+    private String description;
 
     public Book() {}
 
@@ -52,4 +55,7 @@ public class Book {
 
     public boolean isComingSoon() { return comingSoon; }
     public void setComingSoon(boolean comingSoon) { this.comingSoon = comingSoon; }
+    
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 }
