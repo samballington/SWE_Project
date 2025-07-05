@@ -1,45 +1,33 @@
 package com.example.obs.controller;
 
+import com.example.obs.model.User;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class AuthController {
 
     @GetMapping("/login")
-    public String loginPage() {
+    public String login(@RequestParam(required = false) String error, Model model) {
+        if (error != null) {
+            model.addAttribute("loginError", true);
+        }
         return "login";
     }
 
-    @PostMapping("/login")
-    public String doLogin(@RequestParam String username,
-                          @RequestParam String password) {
-
-        if(username.equals("admin") && password.equals("1234")) {
-            return "redirect:/";
-        } else {
-            return "redirect:/login?error";
-        }
-    }
-
     @GetMapping("/register")
-    public String registerPage() {
+    public String registerPage(Model model) {
+        model.addAttribute("user", new User());
         return "register";
     }
 
     @PostMapping("/register")
-    public String doRegister(
-            @RequestParam String username,
-            @RequestParam String email,
-            @RequestParam String password,
-            @RequestParam String confirmPassword,
-            @RequestParam(required = false) String phone,
-            @RequestParam(required = false) String address
-    ) {
-        if (!password.equals(confirmPassword)) {
-            return "redirect:/register?error=password_mismatch";
-        }        
-
-        return "redirect:/login?registered";
+    public String registerUser(@ModelAttribute User user) {
+        // Registration logic (not needed for admin functionality)
+        return "redirect:/login";
     }
 }

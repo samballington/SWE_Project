@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
     <title>Online Bookstore</title>
     <!-- Font Awesome CDN -->
@@ -58,6 +58,7 @@
 			<a href="/register">Register</a>
             <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
             <a href="/profile"><i class="fas fa-user-circle"></i> Profile</a>
+            <a sec:authorize="hasRole('ADMIN')" href="/admin/books"><i class="fas fa-cog"></i> Admin</a>
 			<a href="/cart">
 			    <i class="fas fa-shopping-cart"></i>
 			    Cart (<span id="cart-count">0</span>)
