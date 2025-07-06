@@ -32,4 +32,12 @@ public class BookService {
     public List<Book> searchBooksByGenre(String genre) {
         return bookRepository.findByGenreContaining(genre);
     }
+    
+    public Book saveBook(Book book) {
+        return bookRepository.save(book);
+    }
+    
+    public void deleteBook(Long id) {
+        bookRepository.deleteById(id);
+    }
 }

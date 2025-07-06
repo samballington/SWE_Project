@@ -3,20 +3,25 @@ package com.example.obs.model;
 import jakarta.persistence.*;
 
 @Entity
+@Table(name = "cart_item")
 public class CartItem {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;
-    private Long bookId;
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User userId;
+    @ManyToOne
+    @JoinColumn(name = "book_id")
+    private Book bookId;
     private int quantity;
 
     // Constructors
     public CartItem() {}
 
-    public CartItem(Long userId, Long bookId, int quantity) {
+    public CartItem(User userId, Book bookId, int quantity) {
         this.userId = userId;
         this.bookId = bookId;
         this.quantity = quantity;
@@ -28,19 +33,19 @@ public class CartItem {
         return id;
     }
 
-    public Long getUserId() {
+    public User getUserId() {
         return userId;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(User userId) {
         this.userId = userId;
     }
 
-    public Long getBookId() {
+    public Book getBookId() {
         return bookId;
     }
 
-    public void setBookId(Long bookId) {
+    public void setBookId(Book bookId) {
         this.bookId = bookId;
     }
 

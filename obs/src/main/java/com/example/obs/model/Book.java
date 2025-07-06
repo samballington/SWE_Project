@@ -1,8 +1,10 @@
 package com.example.obs.model;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 
 @Entity
+@Table(name = "book")
 public class Book {
 
     @Id
@@ -13,12 +15,15 @@ public class Book {
     private String author;
     private String genre;
     private String imageUrl;
-    private double price;
-    private boolean comingSoon;
+    private BigDecimal price;
+    private boolean comingSoon; // recommend to use enum for adding more categories in the future
+    
+    @Column(length = 2000)
+    private String description;
 
     public Book() {}
 
-    public Book(Long id, String title, String author, String genre, String imageUrl, double price, boolean comingSoon) {
+    public Book(Long id, String title, String author, String genre, String imageUrl, BigDecimal price, boolean comingSoon) {
         this.id = id;
         this.title = title;
         this.author = author;
@@ -45,9 +50,12 @@ public class Book {
     public String getImageUrl() { return imageUrl; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
 
-    public double getPrice() { return price; }
-    public void setPrice(double price) { this.price = price; }
+    public BigDecimal getPrice() { return price; }
+    public void setPrice(BigDecimal price) { this.price = price; }
 
     public boolean isComingSoon() { return comingSoon; }
     public void setComingSoon(boolean comingSoon) { this.comingSoon = comingSoon; }
+    
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
 }

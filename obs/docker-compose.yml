@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: obs-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: obs_db
+      MYSQL_USER: obs_user
+      MYSQL_PASSWORD: obs_password
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  app:
+    build: .
+    container_name: obs-app
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/obs_db
+      SPRING_DATASOURCE_USERNAME: obs_user
+      SPRING_DATASOURCE_PASSWORD: obs_password
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    volumes:
+      - ./book-images:/app/book-images
+
+volumes:
+  mysql-data:
+    name: obs-mysql-data
+
+networks:
+  obs-network:
+    driver: bridge 
