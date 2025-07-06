@@ -2,58 +2,170 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Register - Online Bookstore</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
-        .container {
-            width: 400px;
-            margin: 50px auto;
-            border: 1px solid #ccc;
-            padding: 20px;
-            background-color: #f9f9f9;
-        }
-        input {
-            width: 100%;
-            padding: 10px;
-            margin-top: 10px;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background-color: #28a745;
-            color: white;
+        .card {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
             border: none;
-            margin-top: 20px;
-            cursor: pointer;
-            font-size: 16px;
+            border-radius: 10px;
         }
-        h2 {
-            text-align: center;
+        .form-section {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .form-section:last-child {
+            border-bottom: none;
+        }
+        .error-message {
+            color: #dc3545;
+            font-size: 0.85rem;
+            margin-top: 0.25rem;
+        }
+        .card-header {
+            background-color: #007bff;
+            color: white;
+        }
+        .required-field::after {
+            content: "*";
+            color: red;
+            margin-left: 4px;
         }
     </style>
 </head>
 <body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Online Bookstore</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/search">Search</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/login">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <div class="container">
-        <h2>Register</h2>
-
-        <form th:action="@{/register}" method="post">
-            <input type="text" name="username" placeholder="Username" required />
-
-            <input type="email" name="email" placeholder="Email" required />
-
-            <input type="password" name="password" placeholder="Password" required />
-
-            <input type="password" name="confirmPassword" placeholder="Confirm Password" required />
-
-            <input type="text" name="phone" placeholder="Phone Number" />
-
-            <input type="text" name="address" placeholder="Address" />
-
-            <button type="submit">Register</button>
-        </form>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="mb-0 text-center">Create an Account</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Display error messages if any -->
+                        <div th:if="${#fields.hasErrors('${user.*}')}" class="alert alert-danger">
+                            <p><i class="fas fa-exclamation-triangle"></i> Please correct the errors below.</p>
+                        </div>
+                    
+                        <form th:action="@{/register}" method="post" th:object="${user}" novalidate>
+                            <!-- Account Information Section -->
+                            <div class="form-section">
+                                <h5 class="mb-3">Account Information</h5>
+                                <div class="form-group">
+                                    <label for="username" class="required-field">Username</label>
+                                    <input type="text" class="form-control" id="username" th:field="*{username}" 
+                                           th:classappend="${#fields.hasErrors('username')} ? 'is-invalid'" required>
+                                    <div th:if="${#fields.hasErrors('username')}" class="invalid-feedback" th:errors="*{username}"></div>
+                                    <small class="form-text text-muted">Username must be between 3 and 30 characters.</small>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="email" class="required-field">Email Address</label>
+                                    <input type="email" class="form-control" id="email" th:field="*{email}" 
+                                           th:classappend="${#fields.hasErrors('email')} ? 'is-invalid'" required>
+                                    <div th:if="${#fields.hasErrors('email')}" class="invalid-feedback" th:errors="*{email}"></div>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="password" class="required-field">Password</label>
+                                        <input type="password" class="form-control" id="password" th:field="*{password}" 
+                                               th:classappend="${#fields.hasErrors('password')} ? 'is-invalid'" required>
+                                        <div th:if="${#fields.hasErrors('password')}" class="invalid-feedback" th:errors="*{password}"></div>
+                                        <small class="form-text text-muted">Password must be at least 6 characters.</small>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="confirmPassword" class="required-field">Confirm Password</label>
+                                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Personal Information Section -->
+                            <div class="form-section">
+                                <h5 class="mb-3">Personal Information</h5>
+                                <div class="form-row">
+                                    <div class="form-group col-md-6">
+                                        <label for="firstName" class="required-field">First Name</label>
+                                        <input type="text" class="form-control" id="firstName" th:field="*{firstName}" 
+                                               th:classappend="${#fields.hasErrors('firstName')} ? 'is-invalid'" required>
+                                        <div th:if="${#fields.hasErrors('firstName')}" class="invalid-feedback" th:errors="*{firstName}"></div>
+                                    </div>
+                                    <div class="form-group col-md-6">
+                                        <label for="lastName" class="required-field">Last Name</label>
+                                        <input type="text" class="form-control" id="lastName" th:field="*{lastName}" 
+                                               th:classappend="${#fields.hasErrors('lastName')} ? 'is-invalid'" required>
+                                        <div th:if="${#fields.hasErrors('lastName')}" class="invalid-feedback" th:errors="*{lastName}"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="phone" class="required-field">Phone Number</label>
+                                    <input type="text" class="form-control" id="phone" th:field="*{phone}" 
+                                           th:classappend="${#fields.hasErrors('phone')} ? 'is-invalid'" required>
+                                    <div th:if="${#fields.hasErrors('phone')}" class="invalid-feedback" th:errors="*{phone}"></div>
+                                    <small class="form-text text-muted">Phone number should be 10-15 digits without spaces or special characters.</small>
+                                </div>
+                            </div>
+                            
+                            <!-- Optional Information Section -->
+                            <div class="form-section">
+                                <h5 class="mb-3">Additional Information (Optional)</h5>
+                                <div class="form-group">
+                                    <label for="address">Address</label>
+                                    <textarea class="form-control" id="address" th:field="*{address}" rows="3"></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="paymentInfo">Payment Information</label>
+                                    <textarea class="form-control" id="paymentInfo" th:field="*{paymentInfo}" rows="3" 
+                                        placeholder="Optional: Enter your preferred payment information (card number, PayPal, etc.)"></textarea>
+                                </div>
+                            </div>
+                            
+                            <div class="text-center">
+                                <button type="submit" class="btn btn-primary btn-lg">
+                                    <i class="fas fa-user-plus"></i> Create Account
+                                </button>
+                                <p class="mt-3">
+                                    Already have an account? <a th:href="@{/login}">Login here</a>
+                                </p>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

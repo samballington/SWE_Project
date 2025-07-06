@@ -1,52 +1,112 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
     <title>Shopping Cart</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .container { width: 700px; margin: 30px auto; }
+        .container { max-width: 900px; margin: 30px auto; }
         table { width: 100%; border-collapse: collapse; }
         th, td { border-bottom: 1px solid #ddd; padding: 10px; }
         th { background-color: #f2f2f2; }
         .total { text-align: right; margin-top: 20px; font-weight: bold; }
         .checkout-btn { background-color: #28a745; color: white; padding: 10px; text-decoration: none; }
+        .cart-actions { margin-top: 20px; display: flex; justify-content: space-between; }
+        .empty-cart { text-align: center; padding: 50px; color: #777; }
     </style>
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Online Bookstore</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/search">Search</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link" href="/register">Register</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="!isAuthenticated()">
+                        <a class="nav-link" href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" href="/profile"><i class="fas fa-user-circle"></i> Profile</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link" href="/admin/books"><i class="fas fa-cog"></i> Admin</a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <form th:action="@{/logout}" method="post" style="display: inline;">
+                            <button type="submit" class="btn btn-link nav-link"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                        </form>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/cart">
+                            <i class="fas fa-shopping-cart"></i> Cart
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-<div class="container">
-    <h2>Shopping Cart</h2>
+    <div class="container">
+        <h2 class="mb-4">Shopping Cart</h2>
 
-    <table>
-        <thead>
-        <tr>
-            <th>Title</th>
-            <th>Price</th>
-            <th>Quantity</th>
-            <th>Subtotal</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="item : ${cartItems}">
-            <td th:text="${item.title}"></td>
-            <td th:text="${item.price}"></td>
-            <td th:text="${item.quantity}"></td>
-            <td th:text="${item.subtotal}"></td>
-        </tr>
-        </tbody>
-    </table>
+        <div th:if="${cartItems.empty}" class="empty-cart">
+            <i class="fas fa-shopping-cart fa-3x mb-3"></i>
+            <h4>Your cart is empty</h4>
+            <p>Browse our books and add some items to your cart.</p>
+            <a href="/" class="btn btn-primary mt-3">Continue Shopping</a>
+        </div>
 
-    <div class="total">
-        Total: $<span th:text="${total}"></span>
+        <div th:unless="${cartItems.empty}">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="item : ${cartItems}">
+                    <td th:text="${item.title}"></td>
+                    <td th:text="${item.price}"></td>
+                    <td th:text="${item.quantity}"></td>
+                    <td th:text="${item.subtotal}"></td>
+                </tr>
+                </tbody>
+            </table>
+
+            <div class="total">
+                Total: $<span th:text="${total}"></span>
+            </div>
+
+            <div class="cart-actions">
+                <form th:action="@{/cart/clear}" method="post">
+                    <button type="submit" class="btn btn-secondary">Clear Cart</button>
+                </form>
+
+                <a href="/checkout" class="btn btn-success">Proceed to Checkout</a>
+            </div>
+        </div>
     </div>
 
-	<div class="cart-actions">
-	    <form th:action="@{/cart/clear}" method="post" style="margin-bottom: 10px;">
-			<button onclick="clearCart()">Clear Cart</button>
-	    </form>
-
-	    <a href="/checkout" class="checkout-btn">Proceed to Checkout</a>
-	</div>
-</div>
-
+    <!-- Bootstrap Scripts -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

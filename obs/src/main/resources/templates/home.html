@@ -55,11 +55,14 @@
         </div>
 
         <div class="navbar-right">
-			<a href="/register">Register</a>
-            <a href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
-            <a href="/profile"><i class="fas fa-user-circle"></i> Profile</a>
+			<a sec:authorize="!isAuthenticated()" href="/register">Register</a>
+            <a sec:authorize="!isAuthenticated()" href="/login"><i class="fas fa-sign-in-alt"></i> Login</a>
+            <a sec:authorize="isAuthenticated()" href="/profile"><i class="fas fa-user-circle"></i> Profile</a>
             <a sec:authorize="hasRole('ADMIN')" href="/admin/books"><i class="fas fa-cog"></i> Admin</a>
-			<a href="/cart">
+            <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" style="display: inline;">
+                <button type="submit"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </form>
+			<a sec:authorize="isAuthenticated()" href="/cart">
 			    <i class="fas fa-shopping-cart"></i>
 			    Cart (<span id="cart-count">0</span>)
 			</a>
@@ -80,11 +83,14 @@
         <p th:text="'$' + ${book.price}"></p>
 		<a th:href="@{'/book/' + ${book.id}}">Details</a>
 
-		<form th:action="@{/cart/add}" method="post">
+		<form sec:authorize="isAuthenticated()" th:action="@{/cart/add}" method="post">
 		    <input type="hidden" name="bookId" th:value="${book.id}" />
 		    <input type="hidden" name="quantity" value="1" />
 		    <button type="submit">Add to Cart</button>
 		</form>
+        <div sec:authorize="!isAuthenticated()">
+            <a href="/login" class="btn btn-primary">Login to Purchase</a>
+        </div>
     </div>
 
 </body>
@@ -127,6 +133,9 @@
             });
     }
 
-    window.onload = loadCartCount;
+    // Load cart count when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadCartCount();
+    });
 </script>
 

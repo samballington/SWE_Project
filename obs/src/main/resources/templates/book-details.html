@@ -83,7 +83,7 @@
                 <div class="price my-3" th:text="'$' + ${book.price}"></div>
                 
                 <div th:if="${!book.comingSoon}" class="my-4">
-                    <form th:action="@{/cart/add}" method="post">
+                    <form sec:authorize="isAuthenticated()" th:action="@{/cart/add}" method="post">
                         <div class="form-row align-items-center">
                             <div class="col-auto">
                                 <label for="quantity">Quantity:</label>
@@ -95,6 +95,9 @@
                             </div>
                         </div>
                     </form>
+                    <div sec:authorize="!isAuthenticated()" class="mt-3">
+                        <a href="/login" class="btn btn-primary">Login to Purchase</a>
+                    </div>
                 </div>
                 
                 <div class="my-4" th:if="${book.description}">
