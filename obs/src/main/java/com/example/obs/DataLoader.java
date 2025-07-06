@@ -14,11 +14,13 @@ public class DataLoader {
     @Bean
     public CommandLineRunner loadData(BookRepository bookRepository) {
         return (args) -> {
-            bookRepository.save(new Book(null, "Little Prince", "Antoine",
-                    "Classic", "/images/littleprince.jpg", BigDecimal.valueOf(15.99), false));
+            if (bookRepository.count() == 0) {
+                bookRepository.save(new Book(null, "Little Prince", "Antoine",
+                        "Classic", "/images/littleprince.jpg", BigDecimal.valueOf(15.99), false));
 
-            bookRepository.save(new Book(null, "Introduction to Algorithms", "Thomas",
-                    "Programming", "/images/algorithms.jpg", BigDecimal.valueOf(99.99), true));
+                bookRepository.save(new Book(null, "Introduction to Algorithms", "Thomas",
+                        "Programming", "/images/algorithms.jpg", BigDecimal.valueOf(99.99), true));
+            }
         };
     }
 }
