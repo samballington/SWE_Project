@@ -113,4 +113,66 @@ public class CartService {
             return items.stream().mapToInt(CartItem::getQuantity).sum();
         }
     }
+    
+    public void updateQuantity(User user, Long bookId, int newQuantity) {
+        if (newQuantity <= 0) {
+            removeFromCart(user, bookId);
+            return;
+        }
+        
+        if (user.getId() != null) {
+            // Registered user - update in database
+            List<CartItem> cartItems = cartItemRepository.findByUserId(user);
+            Optional<CartItem> existing = cartItems.stream()
+                    .filter(item -> item.getBookId().getId().equals(bookId))
+                    .findFirst();
+                    
+            if (existing.isPresent()) {
+                CartItem item = existing.get();
+                item.setQuantity(newQuantity);
+                cartItemRepository.save(item);
+            }
+        } else {
+            // Anonymous user - update in session
+            String sessionId = user.getUsername();
+            List<CartItem> sessionCart = anonymousCarts.get(sessionId);
+            if (sessionCart != null) {
+                Optional<CartItem> existing = sessionCart.stream()
+                        .filter(item -> item.getBookId().getId().equals(bookId))
+                        .findFirst();
+                        
+                if (existing.isPresent()) {
+                    existing.get().setQuantity(newQuantity);
+                }
+            }
+        }
+    }
+    
+    public void removeFromCart(User user, Long bookId) {
+        if (user.getId() != null) {
+            // Registered user - remove from database
+            List<CartItem> cartItems = cartItemRepository.findByUserId(user);
+            Optional<CartItem> existing = cartItems.stream()
+                    .filter(item -> item.getBookId().getId().equals(bookId))
+                    .findFirst();
+                    
+            if (existing.isPresent()) {
+                cartItemRepository.delete(existing.get());
+            }
+        } else {
+            // Anonymous user - remove from session
+            String sessionId = user.getUsername();
+            List<CartItem> sessionCart = anonymousCarts.get(sessionId);
+            if (sessionCart != null) {
+                sessionCart.removeIf(item -> item.getBookId().getId().equals(bookId));
+            }
+        }
+    }
+    
+    public void reorderFromOrder(User user, com.example.obs.model.Order order) {
+        // Add all items from the order back to the cart
+        for (com.example.obs.model.OrderItem orderItem : order.getItems()) {
+            addToCart(user, orderItem.getBook(), orderItem.getQuantity());
+        }
+    }
 }

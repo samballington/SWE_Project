@@ -82,6 +82,29 @@ public class CartController {
         return cartService.getCartItemCount(user);
     }
     
+    @PostMapping("/cart/update")
+    public String updateCartQuantity(@RequestParam Long bookId,
+                                   @RequestParam int quantity) {
+        User user = getCurrentAuthenticatedUser();
+        if (user == null) {
+            return "redirect:/login";
+        }
+        
+        cartService.updateQuantity(user, bookId, quantity);
+        return "redirect:/cart";
+    }
+    
+    @PostMapping("/cart/remove")
+    public String removeFromCart(@RequestParam Long bookId) {
+        User user = getCurrentAuthenticatedUser();
+        if (user == null) {
+            return "redirect:/login";
+        }
+        
+        cartService.removeFromCart(user, bookId);
+        return "redirect:/cart";
+    }
+    
     private User getCurrentAuthenticatedUser() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null && auth.isAuthenticated() && !auth.getName().equals("anonymousUser")) {

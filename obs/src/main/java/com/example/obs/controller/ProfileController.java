@@ -2,6 +2,7 @@ package com.example.obs.controller;
 
 import com.example.obs.model.Order;
 import com.example.obs.model.User;
+import com.example.obs.service.CartService;
 import com.example.obs.service.OrderService;
 import com.example.obs.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class ProfileController {
     @Autowired
     private OrderService orderService;
     
+    @Autowired
+    private CartService cartService;
+    
     @GetMapping
     public String viewProfile(Model model) {
         // Get the current authenticated user
@@ -50,6 +54,32 @@ public class ProfileController {
         model.addAttribute("user", user);
         model.addAttribute("orderHistory", orderHistory);
         return "profile";
+    }
+    
+    @PostMapping("/reorder")
+    public String reorderFromHistory(@RequestParam Long orderId, RedirectAttributes redirectAttributes) {
+        // Get the current authenticated user
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByUsername(auth.getName());
+        
+        if (user == null) {
+            return "redirect:/login";
+        }
+        
+        // Get the order and verify it belongs to the user
+        Order order = orderService.getOrderByIdAndUser(orderId, user);
+        if (order == null) {
+            redirectAttributes.addFlashAttribute("error", "Order not found or access denied");
+            return "redirect:/profile";
+        }
+        
+        // Add all items from the order to the cart
+        cartService.reorderFromOrder(user, order);
+        
+        redirectAttributes.addFlashAttribute("success", 
+            "Order #" + order.getOrderNumber() + " items have been added to your cart!");
+        
+        return "redirect:/cart";
     }
     
     @PostMapping("/updatePersonal")
