@@ -1,6 +1,8 @@
 package com.example.obs.controller;
 
+import com.example.obs.model.Order;
 import com.example.obs.model.User;
+import com.example.obs.service.OrderService;
 import com.example.obs.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -14,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/profile")
 public class ProfileController {
@@ -23,6 +27,9 @@ public class ProfileController {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+    
+    @Autowired
+    private OrderService orderService;
     
     @GetMapping
     public String viewProfile(Model model) {
@@ -37,7 +44,11 @@ public class ProfileController {
             return "redirect:/login";
         }
         
+        // Get order history for the user
+        List<Order> orderHistory = orderService.getOrdersByUser(user);
+        
         model.addAttribute("user", user);
+        model.addAttribute("orderHistory", orderHistory);
         return "profile";
     }
     
