@@ -18,10 +18,24 @@ public class SearchController {
 
     // search function should also include search by author or/and genre
     @GetMapping("/search")
-    public String search(@RequestParam String keyword, Model model) {
-        List<Book> result = bookService.searchBooksByTitle(keyword);
+    public String search(@RequestParam(required = false) String keyword, 
+                        @RequestParam(required = false) String genre, 
+                        Model model) {
+        List<Book> result;
+        
+        if ((keyword == null || keyword.trim().isEmpty()) && (genre == null || genre.trim().isEmpty())) {
+            result = bookService.getAllBooks();
+        } else if (genre != null && !genre.trim().isEmpty() && (keyword == null || keyword.trim().isEmpty())) {
+            result = bookService.searchBooksByGenre(genre);
+        } else if (keyword != null && !keyword.trim().isEmpty() && (genre == null || genre.trim().isEmpty())) {
+            result = bookService.searchBooksByTitle(keyword);
+        } else {
+            result = bookService.searchBooksByTitleAndGenre(keyword, genre);
+        }
+        
         model.addAttribute("books", result);
         model.addAttribute("keyword", keyword);
+        model.addAttribute("genre", genre);
         return "search";
     }
 }

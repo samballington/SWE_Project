@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin - Promo Codes</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .active-badge {
+            background-color: #28a745;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.8em;
+        }
+        .inactive-badge {
+            background-color: #dc3545;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.8em;
+        }
+        .promo-code {
+            font-family: monospace;
+            font-weight: bold;
+            background-color: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <div th:replace="admin/nav :: nav"></div>
+
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Promo Codes Management</h1>
+            <a th:href="@{/admin/promos/new}" class="btn btn-primary">Add New Promo Code</a>
+        </div>
+        
+        <div class="row mb-3">
+            <div class="col-md-12">
+                <div class="alert alert-info">
+                    <h5>Popular Promo Codes:</h5>
+                    <p><strong>SAVE20</strong> - 20% off orders over $50</p>
+                    <p><strong>NEWUSER15</strong> - 15% off for new customers</p>
+                    <p><strong>FREESHIP</strong> - Free shipping on any order</p>
+                    <p><strong>BOOKWORM25</strong> - 25% off for book lovers</p>
+                </div>
+            </div>
+        </div>
+        
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Code</th>
+                    <th>Description</th>
+                    <th>Discount</th>
+                    <th>Min Order</th>
+                    <th>Usage</th>
+                    <th>Status</th>
+                    <th>Valid Until</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="promo : ${promoCodes}">
+                    <td>
+                        <span class="promo-code" th:text="${promo.code}"></span>
+                    </td>
+                    <td th:text="${promo.description}"></td>
+                    <td th:text="${promo.discountPercentage + '%'}"></td>
+                    <td th:text="${promo.minimumOrderAmount != null ? '$' + promo.minimumOrderAmount : 'No minimum'}"></td>
+                    <td>
+                        <span th:text="${promo.usageCount}"></span>
+                        <span th:if="${promo.usageLimit != null}" th:text="${'/' + promo.usageLimit}"></span>
+                        <span th:unless="${promo.usageLimit != null}"> / ∞</span>
+                    </td>
+                    <td>
+                        <span th:if="${promo.active}" class="active-badge">ACTIVE</span>
+                        <span th:unless="${promo.active}" class="inactive-badge">INACTIVE</span>
+                    </td>
+                    <td th:text="${promo.validUntil != null ? #temporals.format(promo.validUntil, 'yyyy-MM-dd') : 'No expiry'}"></td>
+                    <td>
+                        <a th:href="@{/admin/promos/edit/{id}(id=${promo.id})}" class="btn btn-sm btn-info">Edit</a>
+                        <form th:action="@{/admin/promos/toggle/{id}(id=${promo.id})}" method="post" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-warning" th:text="${promo.active ? 'Disable' : 'Enable'}"></button>
+                        </form>
+                        <a th:href="@{/admin/promos/delete/{id}(id=${promo.id})}" 
+                           class="btn btn-sm btn-danger" 
+                           onclick="return confirm('Are you sure you want to delete this promo code?')">Delete</a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

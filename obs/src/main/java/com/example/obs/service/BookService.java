@@ -33,6 +33,10 @@ public class BookService {
         return bookRepository.findByGenreContaining(genre);
     }
     
+    public List<Book> searchBooksByTitleAndGenre(String title, String genre) {
+        return bookRepository.findByTitleContainingAndGenreContaining(title, genre);
+    }
+    
     public Book saveBook(Book book) {
         return bookRepository.save(book);
     }

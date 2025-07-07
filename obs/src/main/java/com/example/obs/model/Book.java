@@ -2,6 +2,7 @@ package com.example.obs.model;
 
 import jakarta.persistence.*;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Entity
 @Table(name = "book")
@@ -20,6 +21,10 @@ public class Book {
     
     @Column(length = 2000)
     private String description;
+    
+    // New promotion fields
+    private boolean isOnSale = false;
+    private BigDecimal discountPercentage = BigDecimal.ZERO;
 
     public Book() {}
 
@@ -58,4 +63,28 @@ public class Book {
     
     public String getDescription() { return description; }
     public void setDescription(String description) { this.description = description; }
+    
+    // New promotion getters/setters
+    public boolean isOnSale() { return isOnSale; }
+    public void setOnSale(boolean onSale) { isOnSale = onSale; }
+    
+    public BigDecimal getDiscountPercentage() { return discountPercentage; }
+    public void setDiscountPercentage(BigDecimal discountPercentage) { this.discountPercentage = discountPercentage; }
+    
+    // Helper methods for pricing
+    public BigDecimal getOriginalPrice() {
+        return price;
+    }
+    
+    public BigDecimal getDiscountedPrice() {
+        if (isOnSale && discountPercentage != null && discountPercentage.compareTo(BigDecimal.ZERO) > 0) {
+            BigDecimal discount = price.multiply(discountPercentage).divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+            return price.subtract(discount);
+        }
+        return price;
+    }
+    
+    public BigDecimal getSavingsAmount() {
+        return getOriginalPrice().subtract(getDiscountedPrice());
+    }
 }

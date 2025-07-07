@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Admin - Promo Code Form</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div th:replace="admin/nav :: nav"></div>
+
+    <div class="container mt-5">
+        <h1 th:text="${promoCode.id == null ? 'Add New Promo Code' : 'Edit Promo Code'}"></h1>
+        
+        <form th:action="@{/admin/promos/save}" method="post">
+            <input type="hidden" name="id" th:value="${promoCode.id}" />
+            
+            <div class="form-group">
+                <label for="code">Promo Code</label>
+                <input type="text" class="form-control" id="code" name="code" th:value="${promoCode.code}" 
+                       style="text-transform: uppercase;" required>
+                <small class="form-text text-muted">Enter a unique code (letters and numbers only, will be converted to uppercase).</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description</label>
+                <input type="text" class="form-control" id="description" name="description" th:value="${promoCode.description}" required>
+                <small class="form-text text-muted">Brief description of the promotion.</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="discountPercentage">Discount Percentage</label>
+                <input type="number" step="0.01" class="form-control" id="discountPercentage" name="discountPercentage" 
+                       th:value="${promoCode.discountPercentage}" min="0" max="100" required>
+                <small class="form-text text-muted">Enter discount percentage (0-100).</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="minimumOrderAmount">Minimum Order Amount ($)</label>
+                <input type="number" step="0.01" class="form-control" id="minimumOrderAmount" name="minimumOrderAmount" 
+                       th:value="${promoCode.minimumOrderAmount}" min="0">
+                <small class="form-text text-muted">Minimum order amount required to use this code (optional).</small>
+            </div>
+            
+            <div class="form-group">
+                <label for="usageLimit">Usage Limit</label>
+                <input type="number" class="form-control" id="usageLimit" name="usageLimit" 
+                       th:value="${promoCode.usageLimit}" min="1">
+                <small class="form-text text-muted">Maximum number of times this code can be used (leave empty for unlimited).</small>
+            </div>
+            
+            <div class="form-check mb-3">
+                <input type="checkbox" class="form-check-input" id="isActive" name="isActive" th:checked="${promoCode.active}">
+                <label class="form-check-label" for="isActive">Active</label>
+                <small class="form-text text-muted">Only active codes can be used by customers.</small>
+            </div>
+            
+            <div class="alert alert-info">
+                <h6>Quick Templates:</h6>
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="fillTemplate('SAVE20', '20% off orders over $50', 20, 50, 100)">20% Off $50+</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="fillTemplate('NEWUSER15', '15% off for new customers', 15, 0, 50)">New User 15%</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="fillTemplate('BOOKWORM25', '25% off for book lovers', 25, 30, 25)">Book Lover 25%</button>
+                <button type="button" class="btn btn-sm btn-outline-primary" onclick="fillTemplate('FREESHIP', 'Free shipping promotion', 10, 25, 200)">Free Ship 10%</button>
+            </div>
+            
+            <div class="mt-4">
+                <button type="submit" class="btn btn-primary">Save Promo Code</button>
+                <a th:href="@{/admin/promos}" class="btn btn-secondary ml-2">Cancel</a>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function fillTemplate(code, description, discount, minOrder, usageLimit) {
+            document.getElementById('code').value = code;
+            document.getElementById('description').value = description;
+            document.getElementById('discountPercentage').value = discount;
+            document.getElementById('minimumOrderAmount').value = minOrder;
+            document.getElementById('usageLimit').value = usageLimit;
+            document.getElementById('isActive').checked = true;
+        }
+        
+        // Auto uppercase the code field
+        document.getElementById('code').addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    </script>
+</body>
+</html> 

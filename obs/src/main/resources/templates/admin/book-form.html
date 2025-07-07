@@ -26,7 +26,14 @@
             
             <div class="form-group">
                 <label for="genre">Genre</label>
-                <input type="text" class="form-control" id="genre" name="genre" th:value="${book.genre}">
+                <select class="form-control" id="genre" name="genre" th:value="${book.genre}">
+                    <option value="Classic" th:selected="${book.genre == 'Classic'}">Classic</option>
+                    <option value="Programming" th:selected="${book.genre == 'Programming'}">Programming</option>
+                    <option value="Fiction" th:selected="${book.genre == 'Fiction'}">Fiction</option>
+                    <option value="Non-Fiction" th:selected="${book.genre == 'Non-Fiction'}">Non-Fiction</option>
+                    <option value="Mystery" th:selected="${book.genre == 'Mystery'}">Mystery</option>
+                    <option value="Romance" th:selected="${book.genre == 'Romance'}">Romance</option>
+                </select>
             </div>
             
             <div class="form-group">
