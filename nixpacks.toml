@@ -8,9 +8,7 @@ nixPkgs = ["openjdk17"]
 [phases.build]
 dependsOn = ["setup"]
 cmds = [
-  "cd obs",
-  "chmod +x mvnw",
-  "./mvnw clean package -DskipTests"
+  "cd obs && chmod +x mvnw && ./mvnw clean package -DskipTests"
 ]
 
 [start]
