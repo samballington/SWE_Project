@@ -73,5 +73,5 @@ public class User {
     
     // Promotions signup
     @Column(name = "promotions_subscribed")
-    private boolean promotionsSubscribed = false;
+    private Boolean promotionsSubscribed = false;
 }
