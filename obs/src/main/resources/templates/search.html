@@ -1,36 +1,236 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
     <title>Search Results - Online Bookstore</title>
+    <!-- Bootstrap 4 CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Custom Global Styles -->
+    <link rel="stylesheet" th:href="@{/css/global.css}" />
+
     <style>
         .book-card {
-            border: 1px solid #ddd;
-            padding: 10px;
-            margin: 10px;
-            width: 200px;
-            float: left;
-            text-align: center;
+            border: 1px solid #e0e0e0;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            background: white;
+            transition: transform 0.2s, box-shadow 0.2s;
+            height: 100%;
         }
-        img {
-            width: 100px;
+        
+        .book-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        
+        .book-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+        
+        .book-title {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #333;
+            margin: 10px 0 5px 0;
+        }
+        
+        .book-author {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+        }
+        
+        .book-genre {
+            background-color: #007bff;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+        
+        .book-price {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #28a745;
+            margin-bottom: 10px;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 3rem;
+            color: #666;
+        }
+        
+        .results-count {
+            margin-bottom: 1.5rem;
+            color: #666;
+        }
+        
+        .search-results-container {
+            margin-top: 2rem;
         }
     </style>
 </head>
 <body>
+    <!-- Navigation Bar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-book mr-2"></i>Online Bookstore
+            </a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home"></i> Home
+                        </a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/search">
+                            <i class="fas fa-search"></i> Search
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="hasRole('ADMIN')">
+                        <a class="nav-link" href="/admin/books">
+                            <i class="fas fa-cog"></i> Admin
+                        </a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav">
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <a class="nav-link" href="/profile">
+                            <i class="fas fa-user"></i> Profile
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAnonymous()">
+                        <a class="nav-link" href="/login">
+                            <i class="fas fa-sign-in-alt"></i> Login
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAnonymous()">
+                        <a class="nav-link" href="/register">
+                            <i class="fas fa-user-plus"></i> Register
+                        </a>
+                    </li>
+                    <li class="nav-item" sec:authorize="isAuthenticated()">
+                        <form th:action="@{/logout}" method="post" style="display: inline;">
+                            <button type="submit" class="btn btn-link nav-link" style="color: rgba(255,255,255,.5);">
+                                <i class="fas fa-sign-out-alt"></i> Logout
+                            </button>
+                        </form>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/cart">
+                            <i class="fas fa-shopping-cart"></i> Cart
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <form th:action="@{/search}" method="get" class="search-form d-flex" id="searchForm">
+                            <input type="text" name="keyword" placeholder="Search books..." class="form-control mr-2" 
+                                   th:value="${keyword}" />
+                            <select name="genre" class="form-control mr-2" style="max-width: 120px;">
+                                <option value="" th:selected="${genre == null or genre == ''}">All Genres</option>
+                                <option value="Classic" th:selected="${genre == 'Classic'}">Classic</option>
+                                <option value="Programming" th:selected="${genre == 'Programming'}">Programming</option>
+                                <option value="Fiction" th:selected="${genre == 'Fiction'}">Fiction</option>
+                                <option value="Non-Fiction" th:selected="${genre == 'Non-Fiction'}">Non-Fiction</option>
+                                <option value="Mystery" th:selected="${genre == 'Mystery'}">Mystery</option>
+                                <option value="Romance" th:selected="${genre == 'Romance'}">Romance</option>
+                            </select>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
 
-    <h2>Search Results for "<span th:text="${keyword}"></span>"</h2>
+    <!-- Search Results -->
+    <div class="container search-results-container">
+        <!-- Results Count -->
+        <div class="results-count" th:if="${books != null}">
+            <h5 th:if="${keyword != null and !keyword.isEmpty() and genre != null and !genre.isEmpty()}">
+                <i class="fas fa-filter mr-2"></i>
+                Search results for "<strong th:text="${keyword}"></strong>" in <strong th:text="${genre}"></strong> 
+                (<span th:text="${#lists.size(books)}"></span> found)
+            </h5>
+            <h5 th:if="${keyword != null and !keyword.isEmpty() and (genre == null or genre.isEmpty())}">
+                <i class="fas fa-search mr-2"></i>
+                Search results for "<strong th:text="${keyword}"></strong>" 
+                (<span th:text="${#lists.size(books)}"></span> found)
+            </h5>
+            <h5 th:if="${(keyword == null or keyword.isEmpty()) and genre != null and !genre.isEmpty()}">
+                <i class="fas fa-tags mr-2"></i>
+                Books in <strong th:text="${genre}"></strong> genre 
+                (<span th:text="${#lists.size(books)}"></span> found)
+            </h5>
+            <h5 th:if="${(keyword == null or keyword.isEmpty()) and (genre == null or genre.isEmpty())}">
+                <i class="fas fa-book mr-2"></i>
+                All Books (<span th:text="${#lists.size(books)}"></span> total)
+            </h5>
+        </div>
 
-    <div th:if="${#lists.isEmpty(books)}">
-        <p>No books found.</p>
+        <!-- No Results Message -->
+        <div th:if="${books != null and #lists.isEmpty(books)}" class="no-results">
+            <i class="fas fa-search fa-3x mb-3 text-muted"></i>
+            <h4>No books found</h4>
+            <p class="lead">Try adjusting your search criteria or browse all books.</p>
+            <a href="/search" class="btn btn-primary">
+                <i class="fas fa-redo mr-1"></i>Clear Search
+            </a>
+            <a href="/" class="btn btn-outline-primary ml-2">
+                <i class="fas fa-home mr-1"></i>Back to Home
+            </a>
+        </div>
+
+        <!-- Book Results Grid -->
+        <div th:if="${books != null and !#lists.isEmpty(books)}" class="row">
+            <div th:each="book : ${books}" class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                <div class="book-card">
+                    <img th:src="${book.imageUrl}" th:alt="${book.title}" class="book-image" 
+                         onerror="this.src='/images/default-book.jpg'"/>
+                    
+                    <div class="book-title" th:text="${book.title}">Book Title</div>
+                    <div class="book-author">
+                        <i class="fas fa-user mr-1"></i>
+                        <span th:text="${book.author}">Author Name</span>
+                    </div>
+                    
+                    <div class="book-genre" th:text="${book.genre}">Genre</div>
+                    
+                    <div class="book-price">
+                        <span th:if="${book.isOnSale()}" class="text-muted" style="text-decoration: line-through; font-size: 0.9rem;">
+                            $<span th:text="${#numbers.formatDecimal(book.originalPrice, 1, 2)}"></span>
+                        </span>
+                        $<span th:text="${#numbers.formatDecimal(book.discountedPrice, 1, 2)}"></span>
+                        <span th:if="${book.isOnSale()}" class="badge badge-danger ml-2">
+                            <span th:text="${book.discountPercentage}"></span>% OFF
+                        </span>
+                    </div>
+                    
+                    <div class="mt-auto">
+                        <a th:href="@{'/book/' + ${book.id}}" class="btn btn-primary btn-sm btn-block">
+                            <i class="fas fa-eye mr-1"></i>View Details
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div th:each="book : ${books}" class="book-card">
-        <img th:src="${book.imageUrl}" alt="Book Cover"/>
-        <h3 th:text="${book.title}"></h3>
-        <p th:text="${book.author}"></p>
-        <p th:text="'$' + ${book.price}"></p>
-        <a th:href="@{'/book/' + ${book.id}}">Details</a>
-    </div>
-
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

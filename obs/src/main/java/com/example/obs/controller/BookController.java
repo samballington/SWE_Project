@@ -25,4 +25,4 @@ public class BookController {
         model.addAttribute("book", book);
         return "book-details";
     }
-} 
+}

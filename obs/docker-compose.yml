@@ -31,6 +31,10 @@ services:
       SPRING_DATASOURCE_USERNAME: obs_user
       SPRING_DATASOURCE_PASSWORD: obs_password
       SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      # Email Configuration - Gmail credentials
+      EMAIL_USERNAME: ballingtonsam@gmail.com
+      EMAIL_PASSWORD: etpn usyx ezdh dmqq
+      APP_BASE_URL: http://localhost:8080
     volumes:
       - ./book-images:/app/book-images
 

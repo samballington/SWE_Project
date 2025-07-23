@@ -31,6 +31,8 @@ public class SecurityConfig {
                 .requestMatchers("/", "/login", "/book/**", "/search").permitAll()
                 .requestMatchers("/cart", "/cart/**").permitAll()
                 .requestMatchers("/checkout", "/checkout/**").permitAll()
+                .requestMatchers("/verify-email", "/resend-verification").permitAll()
+                .requestMatchers("/forgot-password", "/reset-password").permitAll()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
@@ -39,12 +41,19 @@ public class SecurityConfig {
                 .failureUrl("/login?error=true")
                 .permitAll()
             )
+            .rememberMe(remember -> remember
+                .key("uniqueAndSecret") // Change this to a secure secret key in production
+                .tokenValiditySeconds(30 * 24 * 60 * 60) // 30 days
+                .userDetailsService(userDetailsService)
+                .rememberMeParameter("remember-me")
+                .rememberMeCookieName("remember-me-cookie")
+            )
             .logout(logout -> logout
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .logoutSuccessUrl("/?logout=true")
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
-                .deleteCookies("JSESSIONID")
+                .deleteCookies("JSESSIONID", "remember-me-cookie")
                 .permitAll()
             )
             .exceptionHandling(handling -> handling

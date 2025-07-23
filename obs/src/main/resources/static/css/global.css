@@ -1,0 +1,54 @@
+/* Global Styles for Online Book Store */
+
+body {
+    background-color: #f8f9fa; /* Very light gray background */
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    color: #212529;
+}
+
+/* Container backgrounds to maintain readability */
+.card, .checkout-container, .login-container, .container > .row > .col-md-8 {
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Navigation bar enhancement */
+.navbar-dark {
+    background-color: #343a40 !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Button enhancements */
+.btn {
+    border-radius: 6px;
+    font-weight: 500;
+}
+
+/* Form enhancements */
+.form-control {
+    border-radius: 6px;
+    border: 1px solid #ced4da;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+}
+
+/* Alert enhancements */
+.alert {
+    border-radius: 6px;
+    border: none;
+}
+
+/* Card enhancements for book items */
+.book-card {
+    transition: transform 0.2s ease-in-out;
+    background-color: #ffffff;
+}
+
+.book-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+} 

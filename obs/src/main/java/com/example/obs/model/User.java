@@ -51,4 +51,25 @@ public class User {
     private String role = "USER";
     
     private boolean enabled = true;
+    
+    // Email verification fields
+    @Column(name = "email_verified")
+    private boolean emailVerified = false;
+    
+    @Column(name = "verification_token")
+    private String verificationToken;
+    
+    @Column(name = "token_expiry")
+    private java.time.LocalDateTime tokenExpiry;
+    
+    // Password reset fields
+    @Column(name = "password_reset_token")
+    private String passwordResetToken;
+    
+    @Column(name = "password_reset_expiry")
+    private java.time.LocalDateTime passwordResetExpiry;
+    
+    // Promotions signup
+    @Column(name = "promotions_subscribed")
+    private boolean promotionsSubscribed = false;
 }

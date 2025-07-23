@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Custom Global Styles -->
+    <link rel="stylesheet" th:href="@{/css/global.css}" />
 
     <style>
         body {
@@ -270,9 +272,9 @@
                         </form>
                     </li>
                     <li class="nav-item">
-                        <form th:action="@{/}" method="get" class="search-form" id="searchForm">
-                            <input type="text" name="keyword" placeholder="Search books..." class="form-control" />
-                            <select name="genre" class="form-control" style="margin-right: 10px; max-width: 120px;" onchange="document.getElementById('searchForm').submit();">
+                        <form th:action="@{/search}" method="get" class="search-form d-flex" id="searchForm">
+                            <input type="text" name="keyword" placeholder="Search books..." class="form-control mr-2" />
+                            <select name="genre" class="form-control mr-2" style="max-width: 120px;">
                                 <option value="" th:selected="${selectedGenre == null or selectedGenre == ''}">All Genres</option>
                                 <option value="Classic" th:selected="${selectedGenre == 'Classic'}">Classic</option>
                                 <option value="Programming" th:selected="${selectedGenre == 'Programming'}">Programming</option>
@@ -281,6 +283,9 @@
                                 <option value="Mystery" th:selected="${selectedGenre == 'Mystery'}">Mystery</option>
                                 <option value="Romance" th:selected="${selectedGenre == 'Romance'}">Romance</option>
                             </select>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search"></i>
+                            </button>
                         </form>
                     </li>
                 </ul>

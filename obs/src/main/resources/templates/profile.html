@@ -199,6 +199,35 @@
             </div>
         </div>
 
+        <!-- Promotions Subscription -->
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-envelope mr-2"></i>Promotions & Offers
+                </h5>
+            </div>
+            <div class="card-body">
+                <form th:action="@{/profile/updatePromotions}" method="post">
+                    <div class="form-group">
+                        <div class="custom-control custom-checkbox">
+                            <input type="checkbox" class="custom-control-input" id="promotionsSubscribed" 
+                                   name="promotionsSubscribed" th:checked="${user.promotionsSubscribed}">
+                            <label class="custom-control-label" for="promotionsSubscribed">
+                                <strong>Sign up for promotions and special offers via email</strong>
+                            </label>
+                        </div>
+                        <small class="form-text text-muted">
+                            Receive exclusive deals, promo codes, and new book announcements directly to your inbox.
+                        </small>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save mr-1"></i>Update Preferences
+                    </button>
+                </form>
+            </div>
+        </div>
+
         <!-- Order History Section -->
         <div class="card">
             <div class="card-header">

@@ -4,6 +4,8 @@
     <title>Checkout - Online Bookstore</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom Global Styles -->
+    <link rel="stylesheet" th:href="@{/css/global.css}" />
     <style>
         .checkout-container {
             max-width: 900px;
@@ -225,6 +227,27 @@
                                 <span>Subtotal:</span>
                                 <span>$<span id="subtotal-amount" th:text="${#numbers.formatDecimal(subtotal, 1, 2)}"></span></span>
                             </div>
+                            
+                            <!-- Promo Code Section -->
+                            <div class="promo-code-section mt-3 mb-3">
+                                <div class="input-group">
+                                    <input type="text" class="form-control" id="promoCodeInput" name="promoCode" 
+                                           placeholder="Enter promo code (e.g., SAVE20)" maxlength="20" style="text-transform: uppercase;">
+                                    <div class="input-group-append">
+                                        <button type="button" class="btn btn-outline-primary" id="applyPromoBtn">
+                                            <i class="fas fa-tag"></i> Apply
+                                        </button>
+                                    </div>
+                                </div>
+                                <div id="promoMessage" class="mt-2" style="display: none;"></div>
+                            </div>
+                            
+                            <!-- Discount Row (hidden by default) -->
+                            <div class="total-row discount-row" id="discountRow" style="display: none; color: #28a745;">
+                                <span>Discount <span id="discountPercent"></span>:</span>
+                                <span>-$<span id="discount-amount">0.00</span></span>
+                            </div>
+                            
                             <div class="total-row">
                                 <span>Tax (8%):</span>
                                 <span>$<span id="tax-amount" th:text="${#numbers.formatDecimal(tax, 1, 2)}"></span></span>
@@ -291,12 +314,130 @@
                 subtotal += parseFloat(span.textContent);
             });
             
-            const tax = subtotal * 0.08;
-            const total = subtotal + tax;
+            // Get current discount
+            const discountAmount = parseFloat(document.getElementById('discount-amount').textContent) || 0;
+            const discountedSubtotal = subtotal - discountAmount;
+            
+            const tax = discountedSubtotal * 0.08;
+            const total = discountedSubtotal + tax;
             
             document.getElementById('subtotal-amount').textContent = subtotal.toFixed(2);
             document.getElementById('tax-amount').textContent = tax.toFixed(2);
             document.getElementById('total-amount').textContent = total.toFixed(2);
+        }
+        
+        // Promo Code Functionality
+        let appliedPromoCode = null;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            const promoInput = document.getElementById('promoCodeInput');
+            const applyBtn = document.getElementById('applyPromoBtn');
+            const promoMessage = document.getElementById('promoMessage');
+            
+            // Auto-uppercase promo code input
+            promoInput.addEventListener('input', function() {
+                this.value = this.value.toUpperCase();
+            });
+            
+            // Apply promo code on button click
+            applyBtn.addEventListener('click', function() {
+                const promoCode = promoInput.value.trim();
+                if (promoCode) {
+                    validatePromoCode(promoCode);
+                }
+            });
+            
+            // Apply promo code on Enter key
+            promoInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const promoCode = this.value.trim();
+                    if (promoCode) {
+                        validatePromoCode(promoCode);
+                    }
+                }
+            });
+        });
+        
+        function validatePromoCode(promoCode) {
+            const applyBtn = document.getElementById('applyPromoBtn');
+            const promoMessage = document.getElementById('promoMessage');
+            
+            // Show loading state
+            applyBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Checking...';
+            applyBtn.disabled = true;
+            promoMessage.style.display = 'none';
+            
+            // Send AJAX request to validate promo code
+            $.get('/checkout/validate-promo-code', { promoCode: promoCode })
+                .done(function(response) {
+                    if (response.success) {
+                        // Apply the discount
+                        applyDiscount(response.discount, response.discountPercentage, promoCode);
+                        showPromoMessage(response.message, 'success');
+                        appliedPromoCode = promoCode;
+                        
+                        // Disable input and change button to "Remove"
+                        document.getElementById('promoCodeInput').disabled = true;
+                        applyBtn.innerHTML = '<i class="fas fa-times"></i> Remove';
+                        applyBtn.className = 'btn btn-outline-danger';
+                        applyBtn.onclick = removePromoCode;
+                    } else {
+                        showPromoMessage(response.message, 'error');
+                    }
+                })
+                .fail(function() {
+                    showPromoMessage('Error validating promo code. Please try again.', 'error');
+                })
+                .always(function() {
+                    if (appliedPromoCode === null) {
+                        applyBtn.innerHTML = '<i class="fas fa-tag"></i> Apply';
+                        applyBtn.disabled = false;
+                    }
+                });
+        }
+        
+        function applyDiscount(discount, percentage, promoCode) {
+            const discountRow = document.getElementById('discountRow');
+            const discountAmount = document.getElementById('discount-amount');
+            const discountPercent = document.getElementById('discountPercent');
+            
+            discountAmount.textContent = discount.toFixed(2);
+            discountPercent.textContent = `(${percentage}%)`;
+            discountRow.style.display = 'flex';
+            
+            // Recalculate totals with discount
+            recalculateTotals();
+        }
+        
+        function removePromoCode() {
+            // Reset discount
+            document.getElementById('discountRow').style.display = 'none';
+            document.getElementById('discount-amount').textContent = '0.00';
+            
+            // Reset input and button
+            const promoInput = document.getElementById('promoCodeInput');
+            const applyBtn = document.getElementById('applyPromoBtn');
+            const promoMessage = document.getElementById('promoMessage');
+            
+            promoInput.disabled = false;
+            promoInput.value = '';
+            applyBtn.innerHTML = '<i class="fas fa-tag"></i> Apply';
+            applyBtn.className = 'btn btn-outline-primary';
+            applyBtn.onclick = null;
+            promoMessage.style.display = 'none';
+            
+            appliedPromoCode = null;
+            
+            // Recalculate totals without discount
+            recalculateTotals();
+        }
+        
+        function showPromoMessage(message, type) {
+            const promoMessage = document.getElementById('promoMessage');
+            promoMessage.textContent = message;
+            promoMessage.className = `mt-2 alert alert-${type === 'success' ? 'success' : 'danger'}`;
+            promoMessage.style.display = 'block';
         }
     </script>
 </body>

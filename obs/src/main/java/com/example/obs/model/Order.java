@@ -28,6 +28,10 @@ public class Order {
     private String email;
 
     private LocalDateTime createdAt = LocalDateTime.now();
+    
+    // Promo code tracking
+    private String promoCode;
+    private BigDecimal discount = BigDecimal.ZERO;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<OrderItem> items = new ArrayList<>();
@@ -53,4 +57,10 @@ public class Order {
     public void setEmail(String email) {this.email = email;}
     public LocalDateTime getCreatedAt() {return createdAt;}
     public List<OrderItem> getItems() {return items;}
+    
+    // Promo code getters and setters
+    public String getPromoCode() { return promoCode; }
+    public void setPromoCode(String promoCode) { this.promoCode = promoCode; }
+    public BigDecimal getDiscount() { return discount; }
+    public void setDiscount(BigDecimal discount) { this.discount = discount; }
 } 

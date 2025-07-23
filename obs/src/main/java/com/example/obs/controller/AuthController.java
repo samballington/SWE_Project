@@ -83,11 +83,54 @@ public class AuthController {
             User savedUser = userService.registerNewUser(user);
             logger.info("User registered successfully: {}", savedUser.getUsername());
             redirectAttributes.addFlashAttribute("registrationSuccess", true);
+            redirectAttributes.addFlashAttribute("userEmail", savedUser.getEmail());
+            redirectAttributes.addFlashAttribute("message", 
+                "Registration successful! Please check your email to verify your account before logging in.");
             return "redirect:/login";
         } catch (Exception e) {
             logger.error("Registration failed with exception", e);
             result.rejectValue("username", "error.user", "Registration failed: " + e.getMessage());
             return "register";
         }
+    }
+    
+    @GetMapping("/verify-email")
+    public String verifyEmail(@RequestParam String token, RedirectAttributes redirectAttributes) {
+        logger.info("Email verification attempt with token: {}", token);
+        
+        boolean verified = userService.verifyEmail(token);
+        
+        if (verified) {
+            redirectAttributes.addFlashAttribute("verificationSuccess", true);
+            redirectAttributes.addFlashAttribute("message", 
+                "Email verified successfully! You can now log in to your account.");
+            logger.info("Email verification successful for token: {}", token);
+        } else {
+            redirectAttributes.addFlashAttribute("verificationError", true);
+            redirectAttributes.addFlashAttribute("message", 
+                "Invalid or expired verification link. Please try registering again or contact support.");
+            logger.warn("Email verification failed for token: {}", token);
+        }
+        
+        return "redirect:/login";
+    }
+    
+    @PostMapping("/resend-verification")
+    public String resendVerification(@RequestParam String email, RedirectAttributes redirectAttributes) {
+        logger.info("Resend verification email request for: {}", email);
+        
+        boolean sent = userService.resendVerificationEmail(email);
+        
+        if (sent) {
+            redirectAttributes.addFlashAttribute("resendSuccess", true);
+            redirectAttributes.addFlashAttribute("message", 
+                "Verification email has been resent. Please check your inbox.");
+        } else {
+            redirectAttributes.addFlashAttribute("resendError", true);
+            redirectAttributes.addFlashAttribute("message", 
+                "Unable to resend verification email. Email may already be verified or not found.");
+        }
+        
+        return "redirect:/login";
     }
 }

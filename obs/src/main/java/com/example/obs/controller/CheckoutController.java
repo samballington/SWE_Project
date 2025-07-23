@@ -4,7 +4,10 @@ import com.example.obs.model.User;
 import com.example.obs.service.CartService;
 import com.example.obs.service.UserService;
 import com.example.obs.service.OrderService;
+import com.example.obs.service.PromoCodeService;
+import com.example.obs.model.PromoCode;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -13,9 +16,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -32,6 +37,9 @@ public class CheckoutController {
 
     @Autowired
     private OrderService orderService;
+
+    @Autowired
+    private PromoCodeService promoCodeService;
 
     @GetMapping
     public String checkoutPage(Model model) {
@@ -71,6 +79,7 @@ public class CheckoutController {
     public String processCheckout(
             @RequestParam(required = false) String address,
             @RequestParam(required = false) String paymentInfo,
+            @RequestParam(required = false) String promoCode,
             @RequestParam(required = false) boolean saveInfo,
             RedirectAttributes redirectAttributes) {
         
@@ -95,12 +104,29 @@ public class CheckoutController {
         BigDecimal subtotal = cartItems.stream()
                 .map(item -> (BigDecimal) item.get("subtotal"))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal tax = subtotal.multiply(new BigDecimal("0.08"));
-        BigDecimal total = subtotal.add(tax);
         
-        // Persist order
+        // Apply promo code if provided
+        BigDecimal discount = BigDecimal.ZERO;
+        String appliedPromoCode = null;
+        if (promoCode != null && !promoCode.trim().isEmpty()) {
+            PromoCodeService.PromoCodeValidationResult result = 
+                promoCodeService.validateAndCalculate(promoCode, subtotal);
+            if (result.isValid()) {
+                discount = result.getDiscount();
+                appliedPromoCode = promoCode.trim().toUpperCase();
+                // Use the promo code (increment usage count)
+                promoCodeService.usePromoCode(appliedPromoCode);
+            }
+        }
+        
+        // Calculate final totals with discount
+        BigDecimal discountedSubtotal = subtotal.subtract(discount);
+        BigDecimal tax = discountedSubtotal.multiply(new BigDecimal("0.08"));
+        BigDecimal total = discountedSubtotal.add(tax);
+        
+        // Persist order with promo code information
         orderService.createOrder(user, cartItems, subtotal, tax, total,
-                address, paymentInfo, orderNumber);
+                address, paymentInfo, orderNumber, appliedPromoCode, discount);
         
         // Clear the cart
         cartService.clearCart(user);
@@ -109,6 +135,8 @@ public class CheckoutController {
         redirectAttributes.addFlashAttribute("orderNumber", orderNumber);
         redirectAttributes.addFlashAttribute("cartItems", cartItems);
         redirectAttributes.addFlashAttribute("subtotal", subtotal);
+        redirectAttributes.addFlashAttribute("discount", discount);
+        redirectAttributes.addFlashAttribute("promoCode", appliedPromoCode);
         redirectAttributes.addFlashAttribute("tax", tax);
         redirectAttributes.addFlashAttribute("total", total);
         redirectAttributes.addFlashAttribute("userEmail", user.getEmail());
@@ -124,6 +152,37 @@ public class CheckoutController {
         }
         
         return "order-confirmation";
+    }
+
+    @GetMapping("/validate-promo-code")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> validatePromoCode(@RequestParam String promoCode) {
+        Map<String, Object> response = new HashMap<>();
+        
+        User user = getCurrentUser();
+        List<Map<String, Object>> cartItems = cartService.getCartItems(user);
+        BigDecimal subtotal = cartItems.stream()
+                .map(item -> (BigDecimal) item.get("subtotal"))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        
+        PromoCodeService.PromoCodeValidationResult result = 
+            promoCodeService.validateAndCalculate(promoCode, subtotal);
+        
+        if (result.isValid()) {
+            BigDecimal tax = subtotal.subtract(result.getDiscount()).multiply(new BigDecimal("0.08"));
+            BigDecimal newTotal = subtotal.subtract(result.getDiscount()).add(tax);
+            
+            response.put("success", true);
+            response.put("message", result.getMessage());
+            response.put("discount", result.getDiscount());
+            response.put("newTotal", newTotal);
+            response.put("discountPercentage", result.getPromoCode().getDiscountPercentage());
+        } else {
+            response.put("success", false);
+            response.put("message", result.getMessage());
+        }
+        
+        return ResponseEntity.ok(response);
     }
     
     private User getCurrentUser() {

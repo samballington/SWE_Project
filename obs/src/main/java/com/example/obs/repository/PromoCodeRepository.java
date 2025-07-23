@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface PromoCodeRepository extends JpaRepository<PromoCode, Long> {
     Optional<PromoCode> findByCode(String code);
     Optional<PromoCode> findByCodeAndIsActiveTrue(String code);
+    PromoCode findByCodeIgnoreCase(String code);
 } 

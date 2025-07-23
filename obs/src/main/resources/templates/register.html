@@ -4,6 +4,8 @@
     <title>Register - Online Bookstore</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <!-- Custom Global Styles -->
+    <link rel="stylesheet" th:href="@{/css/global.css}" />
     <style>
         .card {
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
@@ -147,6 +149,21 @@
                                     <label for="paymentInfo">Payment Information</label>
                                     <textarea class="form-control" id="paymentInfo" th:field="*{paymentInfo}" rows="3" 
                                         placeholder="Optional: Enter your preferred payment information (card number, PayPal, etc.)"></textarea>
+                                </div>
+                                
+                                <!-- Promotions Signup -->
+                                <div class="form-group">
+                                    <div class="custom-control custom-checkbox">
+                                        <input type="checkbox" class="custom-control-input" id="promotionsSubscribed" 
+                                               th:field="*{promotionsSubscribed}" value="true">
+                                        <label class="custom-control-label" for="promotionsSubscribed">
+                                            <i class="fas fa-envelope text-primary"></i> 
+                                            Sign up for promotions and special offers via email
+                                        </label>
+                                    </div>
+                                    <small class="form-text text-muted">
+                                        You can unsubscribe at any time from your account settings.
+                                    </small>
                                 </div>
                             </div>
                             

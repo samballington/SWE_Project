@@ -21,7 +21,8 @@ public class OrderService {
     @Transactional
     public Order createOrder(User user, List<Map<String,Object>> cartItems,
                              BigDecimal subtotal, BigDecimal tax, BigDecimal total,
-                             String address, String paymentInfo, String orderNumber){
+                             String address, String paymentInfo, String orderNumber,
+                             String promoCode, BigDecimal discount){
         Order order = new Order();
         order.setUser(user);
         order.setOrderNumber(orderNumber);
@@ -31,6 +32,8 @@ public class OrderService {
         order.setShippingAddress(address);
         order.setPaymentInfo(paymentInfo);
         order.setEmail(user.getEmail());
+        order.setPromoCode(promoCode);
+        order.setDiscount(discount);
 
         Order saved = orderRepository.save(order);
 
@@ -44,6 +47,14 @@ public class OrderService {
             saved.getItems().add(item);
         }
         return saved;
+    }
+    
+    // Keep the old method for backward compatibility
+    @Transactional
+    public Order createOrder(User user, List<Map<String,Object>> cartItems,
+                             BigDecimal subtotal, BigDecimal tax, BigDecimal total,
+                             String address, String paymentInfo, String orderNumber){
+        return createOrder(user, cartItems, subtotal, tax, total, address, paymentInfo, orderNumber, null, BigDecimal.ZERO);
     }
     
     public List<Order> getOrdersByUser(User user) {

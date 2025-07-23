@@ -185,4 +185,29 @@ public class ProfileController {
         redirectAttributes.addFlashAttribute("success", "Payment information updated successfully");
         return "redirect:/profile";
     }
+    
+    @PostMapping("/updatePromotions")
+    public String updatePromotions(
+            @RequestParam(defaultValue = "false") boolean promotionsSubscribed,
+            RedirectAttributes redirectAttributes) {
+        
+        // Get the current authenticated user
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = userService.findByUsername(auth.getName());
+        
+        if (user == null) {
+            return "redirect:/login";
+        }
+        
+        // Update promotions subscription
+        user.setPromotionsSubscribed(promotionsSubscribed);
+        userService.updateUser(user);
+        
+        String message = promotionsSubscribed ? 
+            "You have successfully subscribed to promotions and special offers!" :
+            "You have been unsubscribed from promotional emails.";
+            
+        redirectAttributes.addFlashAttribute("success", message);
+        return "redirect:/profile";
+    }
 }
