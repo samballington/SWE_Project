@@ -22,7 +22,7 @@ public class OrderService {
     public Order createOrder(User user, List<Map<String,Object>> cartItems,
                              BigDecimal subtotal, BigDecimal tax, BigDecimal total,
                              String address, String paymentInfo, String orderNumber,
-                             String promoCode, BigDecimal discount){
+                             PromoCode promoCode, BigDecimal discount){
         Order order = new Order();
         order.setUser(user);
         order.setOrderNumber(orderNumber);

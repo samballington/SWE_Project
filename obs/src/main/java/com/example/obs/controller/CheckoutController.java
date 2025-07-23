@@ -107,15 +107,15 @@ public class CheckoutController {
         
         // Apply promo code if provided
         BigDecimal discount = BigDecimal.ZERO;
-        String appliedPromoCode = null;
+        PromoCode appliedPromoCode = null;
         if (promoCode != null && !promoCode.trim().isEmpty()) {
             PromoCodeService.PromoCodeValidationResult result = 
                 promoCodeService.validateAndCalculate(promoCode, subtotal);
             if (result.isValid()) {
                 discount = result.getDiscount();
-                appliedPromoCode = promoCode.trim().toUpperCase();
+                appliedPromoCode = result.getPromoCode();
                 // Use the promo code (increment usage count)
-                promoCodeService.usePromoCode(appliedPromoCode);
+                promoCodeService.usePromoCode(appliedPromoCode.getCode());
             }
         }
         

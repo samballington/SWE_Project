@@ -30,7 +30,9 @@ public class Order {
     private LocalDateTime createdAt = LocalDateTime.now();
     
     // Promo code tracking
-    private String promoCode;
+    @ManyToOne
+    @JoinColumn(name = "promo_code_id")
+    private PromoCode promoCode;
     private BigDecimal discount = BigDecimal.ZERO;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -59,8 +61,8 @@ public class Order {
     public List<OrderItem> getItems() {return items;}
     
     // Promo code getters and setters
-    public String getPromoCode() { return promoCode; }
-    public void setPromoCode(String promoCode) { this.promoCode = promoCode; }
+    public PromoCode getPromoCode() { return promoCode; }
+    public void setPromoCode(PromoCode promoCode) { this.promoCode = promoCode; }
     public BigDecimal getDiscount() { return discount; }
     public void setDiscount(BigDecimal discount) { this.discount = discount; }
 } 
