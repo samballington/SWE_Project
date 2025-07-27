@@ -19,6 +19,9 @@
             transition: transform 0.2s, box-shadow 0.2s;
             height: 100%;
         }
+        .navbar-nav .nav-link:hover {
+            color: white !important;
+        }
         
         .book-card:hover {
             transform: translateY(-2px);
@@ -76,6 +79,14 @@
         .search-results-container {
             margin-top: 2rem;
         }
+        .cart-count {
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.75rem;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -93,11 +104,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="/">
                             <i class="fas fa-home"></i> Home
-                        </a>
-                    </li>
-                    <li class="nav-item active">
-                        <a class="nav-link" href="/search">
-                            <i class="fas fa-search"></i> Search
                         </a>
                     </li>
                     <li class="nav-item" sec:authorize="hasRole('ADMIN')">
@@ -131,7 +137,7 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="/cart">
-                            <i class="fas fa-shopping-cart"></i> Cart
+                            <i class="fas fa-shopping-cart"></i> Cart <span id="cart-count" class="cart-count">0</span>
                         </a>
                     </li>
                     <li class="nav-item">
@@ -232,5 +238,19 @@
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+        function loadCartCount() {
+            axios.get('/cart/count')
+                .then(response => {
+                    document.getElementById("cart-count").textContent = response.data;
+                })
+                .catch(error => {
+                    console.error("Failed to load cart count", error);
+                });
+        }
+
+        window.onload = loadCartCount;
+    </script>
 </body>
 </html>
