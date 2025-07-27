@@ -200,4 +200,9 @@ public class UserService {
         
         return true;
     }
+
+    @Transactional(readOnly = true)
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId).orElse(null);
+    }
 } 
