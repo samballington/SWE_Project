@@ -10,6 +10,8 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 
@@ -133,13 +135,18 @@ public class EmailService {
             BigDecimal subtotal,
             BigDecimal discount,
             BigDecimal tax,
-            BigDecimal total
+            BigDecimal total,
+            String shippingAddress,
+            ZonedDateTime orderDate
     ) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setTo(toEmail);
             message.setFrom(fromEmail);
             message.setSubject("Order Confirmation - Online Book Store (Order: " + orderNumber + ")");
+
+            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MMMM dd, yyyy 'at' hh:mm a z");
+            String formattedDate = orderDate.format(dateFormatter);
 
             StringBuilder itemsBuilder = new StringBuilder();
             for (Map<String, Object> item : cartItems) {
@@ -160,18 +167,20 @@ public class EmailService {
                     "Hello %s,\n\n" +
                             "Thank you for your order!\n\n" +
                             "Order Number: %s\n\n" +
+                            "Order Date: %s\n\n" +
+                            "Shipping To:\n%s\n\n" +
                             "Items:\n%s\n" +
                             "Subtotal: $%s\n" +
                             "Discount: -$%s\n" +
                             "Tax: $%s\n" +
                             "Total: $%s\n\n" +
-                            "You can view your order details at: %s/orders/%s\n\n" +
                             "We appreciate your business!\n\n" +
                             "Best regards,\n" +
                             "Online Book Store Team",
-                    username, orderNumber, itemsBuilder,
-                    subtotal, discount, tax, total,
-                    baseUrl, orderNumber
+                    username, orderNumber, formattedDate,
+                    shippingAddress, itemsBuilder,
+                    subtotal, discount, tax, total
+
             );
 
             message.setText(emailBody);

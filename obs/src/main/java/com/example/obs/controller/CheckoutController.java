@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -128,6 +130,8 @@ public class CheckoutController {
         orderService.createOrder(user, cartItems, subtotal, tax, total,
                 address, paymentInfo, orderNumber, appliedPromoCode, discount);
 
+        ZonedDateTime orderDate = ZonedDateTime.now(ZoneId.of("America/New_York"));
+
         emailService.sendOrderConfirmationEmail(
                 user.getEmail(),
                 user.getUsername(),
@@ -136,7 +140,9 @@ public class CheckoutController {
                 subtotal,
                 discount,
                 tax,
-                total
+                total,
+                address,
+                orderDate
         );
 
         
