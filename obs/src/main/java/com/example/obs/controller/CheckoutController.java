@@ -1,10 +1,7 @@
 package com.example.obs.controller;
 
 import com.example.obs.model.User;
-import com.example.obs.service.CartService;
-import com.example.obs.service.UserService;
-import com.example.obs.service.OrderService;
-import com.example.obs.service.PromoCodeService;
+import com.example.obs.service.*;
 import com.example.obs.model.PromoCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +37,9 @@ public class CheckoutController {
 
     @Autowired
     private PromoCodeService promoCodeService;
+
+    @Autowired
+    private EmailService emailService;
 
     @GetMapping
     public String checkoutPage(Model model) {
@@ -127,6 +127,18 @@ public class CheckoutController {
         // Persist order with promo code information
         orderService.createOrder(user, cartItems, subtotal, tax, total,
                 address, paymentInfo, orderNumber, appliedPromoCode, discount);
+
+        emailService.sendOrderConfirmationEmail(
+                user.getEmail(),
+                user.getUsername(),
+                orderNumber,
+                cartItems,
+                subtotal,
+                discount,
+                tax,
+                total
+        );
+
         
         // Clear the cart
         cartService.clearCart(user);

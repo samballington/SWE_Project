@@ -8,6 +8,11 @@ import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.List;
+import java.util.Map;
+
 @Service
 public class EmailService {
 
@@ -119,4 +124,64 @@ public class EmailService {
             throw new RuntimeException("Failed to send password reset email", e);
         }
     }
-} 
+
+    public void sendOrderConfirmationEmail(
+            String toEmail,
+            String username,
+            String orderNumber,
+            List<Map<String, Object>> cartItems,
+            BigDecimal subtotal,
+            BigDecimal discount,
+            BigDecimal tax,
+            BigDecimal total
+    ) {
+        try {
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(toEmail);
+            message.setFrom(fromEmail);
+            message.setSubject("Order Confirmation - Online Book Store (Order: " + orderNumber + ")");
+
+            StringBuilder itemsBuilder = new StringBuilder();
+            for (Map<String, Object> item : cartItems) {
+                itemsBuilder.append("- ")
+                        .append(item.get("title"))
+                        .append(" (Qty: ")
+                        .append(item.get("quantity"))
+                        .append(") - $")
+                        .append(item.get("subtotal"))
+                        .append("\n");
+            }
+            subtotal = subtotal.setScale(2, RoundingMode.HALF_UP);
+            discount = discount.setScale(2, RoundingMode.HALF_UP);
+            tax = tax.setScale(2, RoundingMode.HALF_UP);
+            total = total.setScale(2, RoundingMode.HALF_UP);
+
+            String emailBody = String.format(
+                    "Hello %s,\n\n" +
+                            "Thank you for your order!\n\n" +
+                            "Order Number: %s\n\n" +
+                            "Items:\n%s\n" +
+                            "Subtotal: $%s\n" +
+                            "Discount: -$%s\n" +
+                            "Tax: $%s\n" +
+                            "Total: $%s\n\n" +
+                            "You can view your order details at: %s/orders/%s\n\n" +
+                            "We appreciate your business!\n\n" +
+                            "Best regards,\n" +
+                            "Online Book Store Team",
+                    username, orderNumber, itemsBuilder,
+                    subtotal, discount, tax, total,
+                    baseUrl, orderNumber
+            );
+
+            message.setText(emailBody);
+
+            mailSender.send(message);
+            logger.info("Order confirmation email sent successfully to: {}", toEmail);
+
+        } catch (Exception e) {
+            logger.error("Failed to send order confirmation email to: " + toEmail, e);
+
+        }
+    }
+}
