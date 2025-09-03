@@ -6,6 +6,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Custom Global Styles -->
     <link rel="stylesheet" th:href="@{/css/global.css}" />
+    <!-- Stripe.js -->
+    <script src="https://js.stripe.com/v3/"></script>
     <style>
         .checkout-container {
             max-width: 900px;
@@ -160,26 +162,40 @@
                         </div>
                         
                         <!-- Credit Card Information -->
-                        <div class="form-group">
-                            <label for="paymentInfo">Credit Card Number</label>
-                            <input type="text" class="form-control" id="paymentInfo" name="paymentInfo" 
-                                   placeholder="**** **** **** 1234" th:required="${!hasPaymentInfo}">
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="expiryDate">Expiry Date</label>
-                                <input type="text" class="form-control" id="expiryDate" placeholder="MM/YY" th:required="${!hasPaymentInfo}">
+                        <div id="card-payment-section">
+                            <div class="form-group">
+                                <label for="paymentInfo">Credit Card Number</label>
+                                <input type="text" class="form-control" id="paymentInfo" name="paymentInfo" 
+                                       placeholder="1234 5678 9012 3456">
                             </div>
-                            <div class="form-group col-md-6">
-                                <label for="cvv">CVV</label>
-                                <input type="text" class="form-control" id="cvv" placeholder="123" th:required="${!hasPaymentInfo}">
+                            
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="expiryDate">Expiry Date</label>
+                                    <input type="text" class="form-control" id="expiryDate" name="expiryDate" 
+                                           placeholder="MM/YY">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="cvv">CVV</label>
+                                    <input type="text" class="form-control" id="cvv" name="cvv" 
+                                           placeholder="123">
+                                </div>
                             </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="cardholderName">Cardholder Name</label>
-                            <input type="text" class="form-control" id="cardholderName" placeholder="John Doe" th:required="${!hasPaymentInfo}">
+                            
+                            <div class="form-group">
+                                <label for="cardholderName">Cardholder Name</label>
+                                <input type="text" class="form-control" id="cardholderName" name="cardholderName" 
+                                       placeholder="John Doe">
+                            </div>
+                            
+                            <!-- Test Card Information -->
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-info-circle"></i> For testing, you can use:</h6>
+                                <strong>Card Number:</strong> 4242 4242 4242 4242<br>
+                                <strong>Expiry:</strong> 12/28<br>
+                                <strong>CVC:</strong> 123<br>
+                                <strong>Name:</strong> Test User
+                            </div>
                         </div>
                         
                         <!-- Save Information Option -->
@@ -259,7 +275,10 @@
                         </div>
                         
                         <!-- Place Order Button -->
-                        <button type="submit" class="btn btn-success btn-lg btn-block mt-4">Place Order</button>
+                        <button type="submit" class="btn btn-success btn-lg btn-block mt-4" id="placeOrderBtn">
+                            <span class="spinner-border spinner-border-sm d-none mr-2" role="status" id="orderSpinner"></span>
+                            <span id="orderButtonText">Place Order</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -438,6 +457,28 @@
             promoMessage.textContent = message;
             promoMessage.className = `mt-2 alert alert-${type === 'success' ? 'success' : 'danger'}`;
             promoMessage.style.display = 'block';
+        }
+        
+        // Form submission handling
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkoutForm = document.querySelector('form[action*="/checkout/process"]');
+            if (checkoutForm) {
+                checkoutForm.addEventListener('submit', handleFormSubmit);
+            }
+        });
+        
+        function handleFormSubmit(e) {
+            const button = document.getElementById('placeOrderBtn');
+            const spinner = document.getElementById('orderSpinner');
+            const buttonText = document.getElementById('orderButtonText');
+            
+            // Show loading state
+            button.disabled = true;
+            spinner.classList.remove('d-none');
+            buttonText.textContent = 'Processing...';
+            
+            // Let form submit normally - remove any preventDefault
+            return true;
         }
     </script>
 </body>

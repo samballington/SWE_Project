@@ -22,6 +22,16 @@ public class BookImageController {
         
         // Try to determine file's content type
         String contentType = "application/octet-stream";
+        String filename = fileName.toLowerCase();
+        if (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) {
+            contentType = "image/jpeg";
+        } else if (filename.endsWith(".png")) {
+            contentType = "image/png";
+        } else if (filename.endsWith(".gif")) {
+            contentType = "image/gif";
+        } else if (filename.endsWith(".webp")) {
+            contentType = "image/webp";
+        }
         
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + file.getFilename() + "\"")
