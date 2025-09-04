@@ -1,7 +1,18 @@
 # Online Bookstore System
 
 A Spring Boot web application for browsing and purchasing books with user authentication, shopping cart functionality, admin management, email verification, password reset, promo codes, and promotions signup.
+ ## 🚀 Live Deployment
 
+  **Running Live with ECS and RDS at:**
+  http://54.234.177.133:8080/
+
+  ---
+
+  ### 🌐 Production Environment
+  - **Platform:** AWS ECS Fargate
+  - **Database:** Amazon RDS MySQL
+  - **Container Registry:** Amazon ECR
+  - **Status:** ✅ Active
 ## Technology Stack
 
 - Spring Boot 3.5.3 (Java 17)
